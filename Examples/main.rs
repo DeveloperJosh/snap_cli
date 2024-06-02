@@ -32,8 +32,8 @@ fn main() {
     // Usage 
     // cli hello --verbose
     // output: Hello, world!
-    // cli bye
-    // output: Goodbye!
+    // cli bye --verbose
+    // output: Goodbye world!
 
     let _matches = app.get_matches();
 }
