@@ -19,7 +19,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-snap = "0.1.1"
+snap = "0.1.2"
 ```
 Usage
 Here's a simple example of how to use Snap:
@@ -45,8 +45,8 @@ fn main() {
     }
 }
 ```
-Examples
-More detailed examples can be found in the examples directory.
+# Examples
+More detailed examples can be found in the [examples](https://github.com/DeveloperJosh/snap_cli/tree/main/Examples) directory.
 
 ```rust
 use snap::App;
