@@ -1,0 +1,11 @@
+[package]
+name = "snap_cli"
+version = "0.1.0"
+authors = ["Blue"]
+edition = "2021"
+description = "A simple CLI library"
+readme = "README.md"
+keywords = ["cli", "command-line", "snap"]
+categories = ["command-line-utilities"]
+license = "MIT"
+
