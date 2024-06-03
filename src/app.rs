@@ -2,6 +2,18 @@ use crate::arg::Arg;
 use crate::command::Command;
 use std::collections::HashMap;
 use std::process::exit;
+use thiserror::Error;
+
+/// Custom error types for the application.
+#[derive(Debug, Error)]
+pub enum AppError {
+    #[error("No arguments provided.")]
+    NoArguments,
+    #[error("Unknown command: {0}")]
+    UnknownCommand(String),
+    #[error("Missing value for argument: {0}")]
+    MissingValue(String),
+}
 
 /// A simple command line argument parser.
 pub struct App<'a> {
@@ -114,14 +126,14 @@ impl<'a> App<'a> {
     ///
     /// # Returns
     ///
-    /// * An instance of `Matches` containing the parsed arguments.
-    pub fn get_matches(&self) -> Matches {
+    /// * An instance of `Matches` containing the parsed arguments or an `AppError`.
+    pub fn get_matches(&self) -> Result<Matches, AppError> {
         let args: Vec<String> = std::env::args().collect();
 
         // Check if no arguments are provided
         if args.len() == 1 {
             self.print_help();
-            exit(0);
+            return Err(AppError::NoArguments);
         }
 
         // Check for help flag first
@@ -133,12 +145,12 @@ impl<'a> App<'a> {
         let mut matches = Matches::new();
 
         // Parse global arguments
-        self.parse_args(&mut matches, &self.args, &args);
+        self.parse_args(&mut matches, &self.args, &args)?;
 
         // Check for command execution
         if args.len() > 1 {
             if let Some(command) = self.commands.get(args[1].as_str()) {
-                let mut command_matches = self.parse_command_args(command, &args[2..]);
+                let mut command_matches = self.parse_command_args(command, &args[2..])?;
                 for (k, v) in matches.args.iter() {
                     command_matches.insert(k, v.clone());
                 }
@@ -148,10 +160,12 @@ impl<'a> App<'a> {
                 } else {
                     self.handle_subcommand(command, &args[2..]);
                 }
+            } else {
+                return Err(AppError::UnknownCommand(args[1].clone()));
             }
         }
 
-        matches
+        Ok(matches)
     }
 
     /// Parses the command line arguments.
@@ -161,7 +175,7 @@ impl<'a> App<'a> {
     /// * `matches` - The `Matches` instance to store the parsed arguments.
     /// * `arg_definitions` - The list of argument definitions.
     /// * `args` - The list of command line arguments.
-    fn parse_args(&self, matches: &mut Matches, arg_definitions: &[Arg], args: &[String]) {
+    fn parse_args(&self, matches: &mut Matches, arg_definitions: &[Arg], args: &[String]) -> Result<(), AppError> {
         let mut i = 0;
         while i < args.len() {
             if args[i].starts_with("--") {
@@ -172,6 +186,8 @@ impl<'a> App<'a> {
                     } else if i + 1 < args.len() {
                         matches.insert(arg_name, args[i + 1].clone());
                         i += 1;
+                    } else {
+                        return Err(AppError::MissingValue(arg_name.to_string()));
                     }
                 } else {
                     // Handle custom arguments
@@ -185,6 +201,7 @@ impl<'a> App<'a> {
             }
             i += 1;
         }
+        Ok(())
     }
 
     /// Parses the command line arguments for a specific command.
@@ -197,11 +214,11 @@ impl<'a> App<'a> {
     /// # Returns
     ///
     /// * An instance of `Matches` containing the parsed arguments.
-    fn parse_command_args(&self, command: &Command, args: &[String]) -> Matches {
+    fn parse_command_args(&self, command: &Command, args: &[String]) -> Result<Matches, AppError> {
         let mut matches = Matches::new();
-        self.parse_args(&mut matches, &command.args, args);
+        self.parse_args(&mut matches, &command.args, args)?;
 
-        matches
+        Ok(matches)
     }
 
     /// Handles the subcommands of a command.
@@ -213,7 +230,7 @@ impl<'a> App<'a> {
     fn handle_subcommand(&self, command: &Command, args: &[String]) {
         if !args.is_empty() {
             if let Some(subcommand) = command.subcommands.get(args[0].as_str()) {
-                let subcommand_matches = self.parse_command_args(subcommand, &args[1..]);
+                let subcommand_matches = self.parse_command_args(subcommand, &args[1..]).unwrap();
                 if let Some(execute) = &subcommand.execute {
                     execute(&subcommand_matches);
                 } else {
@@ -330,8 +347,8 @@ impl Matches {
     ///
     /// # Returns
     ///
-    /// * An `Option` containing the value of the argument if it exists.
-    pub fn get(&self, key: &str) -> Option<&String> {
-        self.args.get(key)
+    /// * A `Result` containing the value of the argument if it exists, otherwise an `AppError`.
+    pub fn get(&self, key: &str) -> Result<&String, AppError> {
+        self.args.get(key).ok_or(AppError::MissingValue(key.to_string()))
     }
 }

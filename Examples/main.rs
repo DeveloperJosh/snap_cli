@@ -16,24 +16,11 @@ fn main() {
                         println!("Hello!");
                     }
                 }),
-        )
-        .command(
-            Command::new("bye")
-                .about("Prints goodbye world")
-                .execute(|matches| {
-                    if matches.is_present("verbose") {
-                        println!("Goodbye, world!");
-                    } else {
-                        println!("Goodbye!");
-                    }
-                }),
         );
 
     // Usage 
     // cli hello --verbose
     // output: Hello, world!
-    // cli bye --verbose
-    // output: Goodbye world!
 
     let _matches = app.get_matches();
 }

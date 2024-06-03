@@ -25,7 +25,6 @@ impl<'a> Arg<'a> {
             is_flag: false,
         }
     }
-
     /// Sets the description of the argument.
     ///
     /// # Arguments
