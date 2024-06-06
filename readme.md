@@ -2,6 +2,7 @@
 
 ![Crates.io](https://img.shields.io/crates/v/snap_cli.svg)
 ![License](https://img.shields.io/crates/l/snap_cli.svg)
+![Need Help?](https://discord.gg/kt4WBmF3yw)
 
 Snap is a lightweight and efficient command-line argument handler, inspired by `clap`.
 
@@ -19,13 +20,13 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-snap = "0.1.3"
+snap = "2.0.0"
 ```
 Usage
 Here's a simple example of how to use Snap:
 
 ```rust
-use snap::App;
+use snap_cli::{app::App, arg::Arg, command::Command};
 
 fn main() {
     let matches = App::new("myapp")
@@ -49,7 +50,7 @@ fn main() {
 More detailed examples can be found in the [examples](https://github.com/DeveloperJosh/snap_cli/tree/main/Examples) directory.
 
 ```rust
-use snap::App;
+use snap_cli::{app::App, arg::Arg, command::Command};
 
 fn main() {
     let matches = App::new("myapp")
