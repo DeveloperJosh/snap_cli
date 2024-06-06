@@ -1,6 +1,6 @@
 [package]
 name = "snap_cli"
-version = "2.0.1"
+version = "2.0.2"
 authors = ["Blue"]
 edition = "2021"
 description = "A simple CLI library"
