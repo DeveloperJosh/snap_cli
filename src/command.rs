@@ -1,5 +1,4 @@
-use crate::arg::Arg;
-use crate::app::Matches;
+use crate::{app::AppError, arg::Arg};
 use std::collections::HashMap;
 
 /// Represents a command in the command-line application.
@@ -93,5 +92,73 @@ impl<'a> Command<'a> {
     {
         self.execute = Some(Box::new(func));
         self
+    }
+}
+
+/// A struct to hold the matches of the parsed command line arguments.
+pub struct Matches {
+    /// A HashMap to store the parsed arguments.
+    pub args: HashMap<String, String>,
+}
+
+impl Matches {
+    /// Creates a new instance of `Matches`.
+    ///
+    /// # Returns
+    ///
+    /// * A new instance of `Matches`.
+    pub fn new() -> Self {
+        Matches {
+            args: HashMap::new(),
+        }
+    }
+
+    /// Inserts a key-value pair into the `Matches`.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the argument.
+    /// * `value` - The value of the argument.
+    pub fn insert(&mut self, key: &str, value: String) {
+        self.args.insert(key.to_string(), value);
+    }
+
+    /// Retrieves the value of a specific argument.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the argument.
+    ///
+    /// # Returns
+    ///
+    /// * An `Option` containing the value of the argument if it exists.
+    pub fn value_of(&self, key: &str) -> Option<&String> {
+        self.args.get(key)
+    }
+
+    /// Checks if a specific argument is present.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the argument.
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the argument is present, `false` otherwise.
+    pub fn is_present(&self, key: &str) -> bool {
+        self.args.contains_key(key)
+    }
+
+    /// Retrieves the value of a specific argument.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the argument.
+    ///
+    /// # Returns
+    ///
+    /// * A `Result` containing the value of the argument if it exists, otherwise an `AppError`.
+    pub fn get(&self, key: &str) -> Result<&String, AppError> {
+        self.args.get(key).ok_or(AppError::MissingValue(key.to_string()))
     }
 }
