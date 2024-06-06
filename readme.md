@@ -20,7 +20,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-snap = "0.1.5"
+snap = "2.0.0"
 ```
 Usage
 Here's a simple example of how to use Snap:
