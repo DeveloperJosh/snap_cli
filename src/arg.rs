@@ -4,10 +4,14 @@ use crate::command::Matches;
 pub struct Arg<'a> {
     /// The name of the argument.
     pub name: &'a str,
+    /// A short version of the argument name.
+    pub short: Option<&'a str>,
     /// A brief description of the argument.
     pub about: &'a str,
     /// Indicates if the argument is a flag (i.e., does not take a value).
     pub is_flag: bool,
+    /// Indicates if the argument is positional.
+    pub is_positional: bool,
     /// The default value of the argument.
     pub default: Option<&'a str>,
 }
@@ -25,8 +29,10 @@ impl<'a> Arg<'a> {
     pub fn new(name: &'a str) -> Self {
         Arg {
             name,
+            short: None,
             about: "",
             is_flag: false,
+            is_positional: false,
             default: None,
         }
     }
@@ -45,6 +51,20 @@ impl<'a> Arg<'a> {
         self
     }
 
+    /// Sets a short version of the argument name.
+    ///
+    /// # Arguments
+    ///
+    /// * `short` - The short version of the argument name.
+    ///
+    /// # Returns
+    ///
+    /// * An instance of `Arg` with the short version set.
+    pub fn short(mut self, short: &'a str) -> Self {
+        self.short = Some(short);
+        self
+    }
+
     /// Sets whether the argument is a flag.
     ///
     /// # Arguments
@@ -56,6 +76,20 @@ impl<'a> Arg<'a> {
     /// * An instance of `Arg` with the flag status set.
     pub fn is_flag(mut self, is_flag: bool) -> Self {
         self.is_flag = is_flag;
+        self
+    }
+
+    /// Sets whether the argument is positional.
+    ///
+    /// # Arguments
+    ///
+    /// * `is_positional` - A boolean indicating if the argument is positional.
+    ///
+    /// # Returns
+    ///
+    /// * An instance of `Arg` with the positional status set.
+    pub fn is_positional(mut self, is_positional: bool) -> Self {
+        self.is_positional = is_positional;
         self
     }
 
@@ -71,20 +105,5 @@ impl<'a> Arg<'a> {
     pub fn default(mut self, default: &'a str) -> Self {
         self.default = Some(default);
         self
-    }
-}
-
-impl Matches {
-    /// Get a value of an argument as a string.
-    pub fn value_of_str(&self, key: &str, default: &str) -> String {
-        self.value_of(key).unwrap_or(&default.to_string()).to_string()
-    }
-
-    /// Get a value of an argument as an integer.
-    pub fn value_of_int(&self, key: &str, default: i32) -> i32 {
-        self.value_of(key)
-            .unwrap_or(&default.to_string())
-            .parse::<i32>()
-            .unwrap_or(default)
     }
 }
